@@ -1,16 +1,21 @@
 <template>
-	<div>TEST</div>
+	<div></div>
 </template>
 
 <script>
 	export default{
 		name: 'OrganizerTools',
 		methods :{
-
+			loadEvents(){
+				axios.get('parties/').then(response => {
+					this.events = response.data;
+					console.log(this.events)
+				})
+			}
 		}, 
 		data(){
 			return {
-			
+				events : null
 			}
 		},
 		watch:{
@@ -19,7 +24,7 @@
 		    }
 		}, 		
 		mounted(){
-			
+			this.loadEvents();
 		}
 	}
 </script>
