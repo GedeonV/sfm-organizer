@@ -8,7 +8,7 @@ Vue.config.productionTip = false
 Vue.prototype.$bus = new Vue()
 
 window.axios = axios.create({
-      baseURL: 'https://tools.sopress.net/iut/coop/api/',
+      baseURL: 'https://sfm-project.herokuapp.com/',
       params : {
         token : false
       },
