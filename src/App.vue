@@ -7,6 +7,18 @@
   </div>
 </template>
 
+
+<script>
+  export default {
+    mounted(){
+      let header = document.createElement('script')
+        header.setAttribute('src', 'https://use.fontawesome.com/releases/v5.3.1/js/all.js')
+        document.head.appendChild(header)
+    }
+  }
+</script>
+
+
 <style lang="scss">
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
