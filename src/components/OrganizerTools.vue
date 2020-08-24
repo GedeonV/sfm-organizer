@@ -1,7 +1,11 @@
 <template>
 	<div>
 		<ul>
-			<li v-for="item in this.events">{{item}}
+			<li v-for="item in this.events">
+
+				<router-link :to="{name: 'event', params: { id: item._id }}">
+					{{item}}
+				</router-link>
 				<a @click="deleteEvent(item._id)">
 					<span class="icon has-text-danger">
 							<i class="fas fa-trash-alt"></i>
