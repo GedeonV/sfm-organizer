@@ -66,6 +66,11 @@
 				}
 			}
 		},
+		mounted(){
+			if(this.$store.state.user){
+         		this.$router.push('/admin')
+        	}
+		}
 	}
 
 </script>

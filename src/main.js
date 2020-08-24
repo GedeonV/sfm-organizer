@@ -31,12 +31,22 @@ window.axios = axios.create({
         token : false
       },
       headers: {
-        Authorization: ""
+        //Authorization: ""
       }
     });
 
 new Vue({
   router,
   store,
-  render: function (h) { return h(App) }
+  render: function (h) { return h(App) },
+  beforeCreate() {
+    window.axios.interceptors.request.use((config) => {
+      if(this.$store.state.user_token){
+         config.headers['Authorization'] = 'Bearer ' + this.$store.state.user_token   
+      }
+      return config
+    }, error => {
+      return console.log(error)
+    })
+  }
 }).$mount('#app')

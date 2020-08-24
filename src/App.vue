@@ -14,12 +14,32 @@
       logout(){
         this.$store.commit('logout')
         this.$router.push('/')
-      }
-    },
+      },
+      onRouteChange(){
+          if(this.$store.state.user == false){
+            this.$router.push('/')
+          }
+        }
+      },
+
+    watch:{
+        $route (to, from){
+          this.onRouteChange();
+        }
+    }, 
+
     mounted(){
+      if(this.$store.state.user == false){
+          this.$router.push('/')
+        }
       let header = document.createElement('script')
         header.setAttribute('src', 'https://use.fontawesome.com/releases/v5.3.1/js/all.js')
         document.head.appendChild(header)
+    },
+    computed : {
+      tokenSet(){
+        return (this.$store.state.user_token !== '') ? this.$store.state.user_token : ""
+      }
     },
   }
 </script>

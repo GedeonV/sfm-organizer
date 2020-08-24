@@ -13,17 +13,20 @@ export default new Vuex.Store({
   plugins : [vp.plugin],
   
   state: {
-    user: null
+    user: null,
+    user_token : '',
     //members: false
   },
 
   mutations: {
     user(state, data){
       state.user = data;
+      state.user_token = data.token;
     },
 
     logout(state){
       state.user = null;
+      state.user_token = null; 
     }
   }
 })
