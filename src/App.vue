@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div id="nav">
-      <router-link to="/admin">Panel</router-link>
+      <a v-if="this.$store.state.user" type="button" @click="logout()" class="router-link-active" href="#">Déconnexion</a>
     </div>
     <router-view/>
   </div>
@@ -10,11 +10,17 @@
 
 <script>
   export default {
+    methods :{
+      logout(){
+        this.$store.commit('logout')
+        this.$router.push('/')
+      }
+    },
     mounted(){
       let header = document.createElement('script')
         header.setAttribute('src', 'https://use.fontawesome.com/releases/v5.3.1/js/all.js')
         document.head.appendChild(header)
-    }
+    },
   }
 </script>
 
