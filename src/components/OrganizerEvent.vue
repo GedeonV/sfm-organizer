@@ -7,7 +7,15 @@
 		<p>Code : {{event_data.event_code}}
 		<hr>
 		<h2 class="title">Inscriptions</h2>
-		<div v-for="item in this.event_data.users">{{item}}</div>
+		<ul>
+			<li v-for="item in this.event_data.users">
+				{{item}}
+				<a @click="deleteUser(item._id)">
+					<span class="icon has-text-danger">
+							<i class="fas fa-trash-alt"></i>
+					</span>
+				</a></li>
+		</ul>
 		<hr>
 		<h2 class="title">Chansons</h2>
 		<input type="file" @change="loadFile" name="file">
@@ -28,6 +36,13 @@
 				axios.get('parties/event/'+this.$route.params.id).then(response => {
 					this.event_data = response.data;
 					console.log(this.event_data)
+				})
+			},
+
+			deleteUser(id){
+				axios.delete('parties/event/'+this.$route.params.id+'/remove',{data: {userId: id}}).then(response => {
+					console.log(response.data)
+					this.loadEvent()
 				})
 			}
 		}, 
