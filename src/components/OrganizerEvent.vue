@@ -4,7 +4,8 @@
 		<p>Description : {{event_data.description}}</p>
 		<p>Date : {{event_data.date}}</p>
 		<p>Theme : {{event_data.theme}}</p>
-		<p>Code : {{event_data.event_code}}
+		<p>Code : {{event_data.event_code}}</p>
+		<p>State: {{event_data.state}}</p>
 		<hr>
 		<h2 class="title">Inscriptions</h2>
 		<ul>
@@ -19,6 +20,28 @@
 		<hr>
 		<h2 class="title">Chansons</h2>
 		<input type="file" @change="loadFile" name="file">
+		<hr>
+		<div v-if="event_data.state == 0">
+			<div class="field">
+				<div class="control">
+	    			<button @click='startEvent()' class="button is-link">Lancer</button>
+	  			</div>
+			</div>
+		</div>
+		<div v-if="event_data.state == 1">
+			<div class="field">
+				<div class="control">
+	    			<button @click='endEvent()' class="button is-danger">Stopper</button>
+	  			</div>
+			</div>
+		</div>
+		<div v-if="event_data.state == 2">
+			<div class="field">
+				<div class="control">
+	    			<button @click='startEvent()' class="button is-success">Recommencer</button>
+	  			</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -26,6 +49,23 @@
 	export default{
 		name: 'OrganizerEvent',
 		methods :{
+
+			startEvent(){
+				axios.put('parties/event/'+this.$route.params.id+'/state',{state: 1})
+				.then(response => {
+					console.log(response.data)
+					this.loadEvent()
+				})
+			},
+
+			endEvent(){
+				axios.put('parties/event/'+this.$route.params.id+'/state',{state: 2})
+				.then(response => {
+					console.log(response.data)
+					this.loadEvent()
+				})
+			},
+
 			loadFile(af){
 				const file = af.target.files[0];
       			const reader = new FileReader()
@@ -33,14 +73,16 @@
       			reader.onload = e => this.$emit("load", e.target.result);
 			},
 			loadEvent(){
-				axios.get('parties/event/'+this.$route.params.id).then(response => {
+				axios.get('parties/event/'+this.$route.params.id)
+				.then(response => {
 					this.event_data = response.data;
 					console.log(this.event_data)
 				})
 			},
 
 			deleteUser(id){
-				axios.delete('parties/event/'+this.$route.params.id+'/remove',{data: {userId: id}}).then(response => {
+				axios.delete('parties/event/'+this.$route.params.id+'/remove',{data: {userId: id}})
+				.then(response => {
 					console.log(response.data)
 					this.loadEvent()
 				})
