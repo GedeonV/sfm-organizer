@@ -1,8 +1,5 @@
 <template>
   <div>
-    <audio controls>
-      <source src="http://localhost:5000/music.mp3" type="audio/mpeg" />
-    </audio>
     <ul>
       <li v-for="item in this.events" :key="item._id">
         <router-link :to="{ name: 'event', params: { id: item._id } }">{{ item }}</router-link>
