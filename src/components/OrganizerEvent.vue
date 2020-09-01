@@ -9,7 +9,7 @@
     <hr />
     <h2 class="title">Inscriptions</h2>
     <ul>
-      <li v-for="item in this.event_data.users">
+      <li v-for="item in this.event_data.users" v-bind:key="item._id">
         {{ item }}
         <a @click="deleteUser(item._id)">
           <span class="icon has-text-danger">
@@ -39,9 +39,7 @@
     <div v-if="event_data.state == 2">
       <div class="field">
         <div class="control">
-          <button @click="startEvent()" class="button is-success">
-            Recommencer
-          </button>
+          <button @click="startEvent()" class="button is-success">Recommencer</button>
         </div>
       </div>
     </div>
