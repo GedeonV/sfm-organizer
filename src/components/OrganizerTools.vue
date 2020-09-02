@@ -2,7 +2,9 @@
   <div>
     <ul>
       <li v-for="item in this.events" :key="item._id">
-        <router-link :to="{ name: 'event', params: { id: item._id } }">{{ item }}</router-link>
+        <router-link :to="{ name: 'event', params: { id: item._id } }">{{
+          item
+        }}</router-link>
         <a @click="deleteEvent(item._id)">
           <span class="icon has-text-danger">
             <i class="fas fa-trash-alt"></i>
@@ -31,7 +33,12 @@
     <div class="field">
       <label class="label">Nom</label>
       <div class="control">
-        <input class="input" v-model="event_name" type="text" placeholder="Nom de l'événement" />
+        <input
+          class="input"
+          v-model="event_name"
+          type="text"
+          placeholder="Nom de l'événement"
+        />
       </div>
     </div>
 
@@ -52,13 +59,21 @@
       @update:bounds="boundsUpdated"
     >
       <l-tile-layer :url="url"></l-tile-layer>
-      <l-marker v-for="(marker, index) in markers" :lat-lng="marker" :key="index"></l-marker>
+      <l-marker
+        v-for="(marker, index) in markers"
+        :lat-lng="marker"
+        :key="index"
+      ></l-marker>
     </l-map>
 
     <div class="field">
       <label class="label">Description</label>
       <div class="control">
-        <textarea class="textarea" v-model="description" placeholder="Primary textarea"></textarea>
+        <textarea
+          class="textarea"
+          v-model="description"
+          placeholder="Primary textarea"
+        ></textarea>
       </div>
     </div>
 
@@ -77,13 +92,44 @@
     <div class="field">
       <label class="label">Thème</label>
       <div class="control">
-        <input class="input" type="text" v-model="theme" placeholder="Thème de la soirée" />
+        <input
+          class="input"
+          type="text"
+          v-model="theme"
+          placeholder="Thème de la soirée"
+        />
       </div>
     </div>
 
     <div class="field">
       <div class="control">
         <button @click="submit()" class="button is-link">Submit</button>
+      </div>
+    </div>
+
+    <hr />
+    <label class="label">Ajouter une musique au catalogue</label>
+    <div class="field is-grouped">
+      <div class="file has-name">
+        <label class="file-label">
+          <input
+            class="file-input"
+            @change="loadFile"
+            type="file"
+            name="resume"
+          />
+          <span class="file-cta">
+            <span class="file-icon">
+              <i class="fas fa-upload"></i>
+            </span>
+            <span class="file-label">Choose a file…</span>
+          </span>
+          <span v-if="isEmpty" class="file-name">{{ this.file.name }}</span>
+          <span v-else class="file-name">.....</span>
+        </label>
+      </div>
+      <div class="control">
+        <button @click="submitFile()" class="button is-link">Submit</button>
       </div>
     </div>
 
@@ -95,7 +141,12 @@
         <div class="field">
           <label class="label">Nom</label>
           <div class="control">
-            <input class="input" type="text" v-model="tempName" placeholder="Nom de l'événement" />
+            <input
+              class="input"
+              type="text"
+              v-model="tempName"
+              placeholder="Nom de l'événement"
+            />
           </div>
         </div>
 
@@ -116,13 +167,21 @@
           @update:bounds="boundsUpdated_2"
         >
           <l-tile-layer :url="url_2"></l-tile-layer>
-          <l-marker v-for="(marker, index) in markers_2" :lat-lng="marker" :key="index"></l-marker>
+          <l-marker
+            v-for="(marker, index) in markers_2"
+            :lat-lng="marker"
+            :key="index"
+          ></l-marker>
         </l-map>
 
         <div class="field">
           <label class="label">Description</label>
           <div class="control">
-            <textarea class="textarea" v-model="tempDesc" placeholder="Primary textarea"></textarea>
+            <textarea
+              class="textarea"
+              v-model="tempDesc"
+              placeholder="Primary textarea"
+            ></textarea>
           </div>
         </div>
 
@@ -141,17 +200,28 @@
         <div class="field">
           <label class="label">Thème</label>
           <div class="control">
-            <input class="input" type="text" v-model="tempTheme" placeholder="Thème de la soirée" />
+            <input
+              class="input"
+              type="text"
+              v-model="tempTheme"
+              placeholder="Thème de la soirée"
+            />
           </div>
         </div>
 
         <div class="field">
           <div class="control">
-            <button @click="changeEvent(event_id)" class="button is-link">Submit</button>
+            <button @click="changeEvent(event_id)" class="button is-link">
+              Submit
+            </button>
           </div>
         </div>
       </div>
-      <button class="modal-close is-large" @click="closeModal()" aria-label="close"></button>
+      <button
+        class="modal-close is-large"
+        @click="closeModal()"
+        aria-label="close"
+      ></button>
     </div>
   </div>
 </template>
@@ -190,6 +260,10 @@ export default {
       center_2: [0, 0],
       bounds_2: null,
       markers_2: [],
+      //==================//
+      file: {},
+      songTags: null,
+      isEmpty: false,
     };
   },
 
@@ -201,6 +275,49 @@ export default {
         this.center = [lat, long];
         this.center_2 = [lat, long];
       });
+    },
+
+    loadFile(af) {
+      const file = af.target.files[0];
+      const reader = new FileReader();
+      console.log(file);
+      jsmediatags.read(file, {
+        onSuccess: (tag) => {
+          console.log(tag.tags);
+          this.songTags = new FormData();
+          this.songTags.append("title", tag.tags.title);
+          this.songTags.append("artist", tag.tags.artist);
+          this.songTags.append("album", tag.tags.album);
+          this.songTags.append("date", tag.tags.year);
+          //formData.append("style", this.file);
+          //formData.append("time", this.file);
+          this.songTags.append("songFile", this.file);
+        },
+        onError: (error) => {
+          console.log(error);
+        },
+      });
+      this.file = file;
+      this.isEmpty = true;
+      reader.onload = (e) => {
+        this.$emit("load", e.target.result);
+      };
+    },
+
+    submitFile() {
+      console.log(this.songTags);
+      axios
+        .post("/songs/upload", this.songTags, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          console.log(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     addMarker(event) {
@@ -293,7 +410,7 @@ export default {
     },
 
     showModalEvent(id, name, date, location, description, code, theme) {
-      setTimeout(function () {
+      setTimeout(function() {
         window.dispatchEvent(new Event("resize"));
       }, 250); // Aide à charger correctement la map (hack)
       this.isActiveEvent = true;
@@ -317,6 +434,12 @@ export default {
   mounted() {
     this.loadEvents();
     this.loadPosition();
+    let header = document.createElement("script");
+    header.setAttribute(
+      "src",
+      "https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.3/jsmediatags.min.js"
+    );
+    document.head.appendChild(header);
   },
 };
 </script>
