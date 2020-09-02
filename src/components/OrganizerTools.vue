@@ -2,9 +2,9 @@
   <div>
     <ul>
       <li v-for="item in this.events" :key="item._id">
-        <router-link :to="{ name: 'event', params: { id: item._id } }">{{
-          item
-        }}</router-link>
+        <router-link :to="{ name: 'event', params: { id: item._id } }">
+          {{ item }}
+        </router-link>
         <a @click="deleteEvent(item._id)">
           <span class="icon has-text-danger">
             <i class="fas fa-trash-alt"></i>
@@ -109,7 +109,7 @@
 
     <hr />
     <label class="label">Ajouter une musique au catalogue</label>
-    <div class="field is-grouped">
+    <div class="field has-addons is-grouped">
       <div class="file has-name">
         <label class="file-label">
           <input
@@ -117,21 +117,50 @@
             @change="loadFile"
             type="file"
             name="resume"
+            :disabled="isSending === 1"
           />
           <span class="file-cta">
             <span class="file-icon">
               <i class="fas fa-upload"></i>
             </span>
-            <span class="file-label">Choose a file…</span>
+            <span class="file-label">Choisir un fichier</span>
           </span>
           <span v-if="isEmpty" class="file-name">{{ this.file.name }}</span>
-          <span v-else class="file-name">.....</span>
+          <span v-else class="file-name">Aucun fichier choisi</span>
         </label>
       </div>
-      <div class="control">
-        <button @click="submitFile()" class="button is-link">Submit</button>
+
+      <div v-if="isSending === 0" class="control">
+        <a @click="submitFile()" class="button is-info">
+          Envoyer
+        </a>
+      </div>
+
+      <div v-if="isSending === 1" class="control">
+        <a class="button is-info">
+          Envoi en cours
+          <div class="ld ld-ring ld-spin " style="margin-left: 5px;"></div>
+        </a>
+      </div>
+
+      <div v-if="isSending === 2" class="control">
+        <a class="button is-success">
+          Fichier Envoyer
+          <i class="fas fa-check" style="margin-left: 5px ;"></i>
+        </a>
+      </div>
+
+      <div v-if="isSending === 3" class="control">
+        <a class="button is-danger">
+          Erreur
+          <i class="fas fa-times" style="margin-left: 5px ;"></i>
+        </a>
       </div>
     </div>
+
+    <ul>
+      <li v-for="item in this.songsList" :key="item._id">{{ item }}</li>
+    </ul>
 
     <div class="modal" v-bind:class="{ 'is-active': isActiveEvent }">
       <div class="modal-background"></div>
@@ -227,6 +256,12 @@
 </template>
 
 <script>
+window.onbeforeunload = () => {
+  if (isSending) {
+    return "";
+  }
+};
+
 export default {
   name: "OrganizerTools",
 
@@ -264,6 +299,8 @@ export default {
       file: {},
       songTags: null,
       isEmpty: false,
+      songsList: null,
+      isSending: 0,
     };
   },
 
@@ -284,17 +321,17 @@ export default {
       jsmediatags.read(file, {
         onSuccess: (tag) => {
           console.log(tag.tags);
+          this.isSending = 0;
           this.songTags = new FormData();
           this.songTags.append("title", tag.tags.title);
           this.songTags.append("artist", tag.tags.artist);
           this.songTags.append("album", tag.tags.album);
           this.songTags.append("date", tag.tags.year);
-          //formData.append("style", this.file);
-          //formData.append("time", this.file);
           this.songTags.append("songFile", this.file);
         },
         onError: (error) => {
-          console.log(error);
+          console.log("jsmediatags_error: " + error);
+          this.isSending = 3;
         },
       });
       this.file = file;
@@ -305,6 +342,7 @@ export default {
     },
 
     submitFile() {
+      this.isSending = 1;
       console.log(this.songTags);
       axios
         .post("/songs/upload", this.songTags, {
@@ -314,9 +352,16 @@ export default {
         })
         .then((response) => {
           console.log(response.data);
+          if (response.data.error) {
+            this.isSending = 3;
+          } else {
+            this.isSending = 2;
+            this.loadSongs();
+          }
         })
         .catch((err) => {
           console.log(err);
+          this.isSending = 3;
         });
     },
 
@@ -365,6 +410,18 @@ export default {
         this.events = response.data;
         console.log(this.events);
       });
+    },
+
+    loadSongs() {
+      axios
+        .get("songs/")
+        .then((response) => {
+          this.songsList = response.data;
+          console.log(this.songsList);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     submit() {
@@ -431,15 +488,33 @@ export default {
   watch: {
     $route(to, from) {},
   },
+
+  beforeRouteLeave(to, from, next) {
+    const answer = window.confirm(
+      "Do you really want to leave? you have unsaved changes!"
+    );
+    if (answer) {
+      next();
+    } else {
+      next(false);
+    }
+  },
+
   mounted() {
     this.loadEvents();
     this.loadPosition();
+    this.loadSongs();
     let header = document.createElement("script");
     header.setAttribute(
       "src",
       "https://cdnjs.cloudflare.com/ajax/libs/jsmediatags/3.9.3/jsmediatags.min.js"
     );
     document.head.appendChild(header);
+    window.onbeforeunload = () => {
+      if (this.isSending == 1) {
+        return "";
+      }
+    };
   },
 };
 </script>
