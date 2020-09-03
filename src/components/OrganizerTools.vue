@@ -2,9 +2,9 @@
   <div>
     <ul>
       <li v-for="item in this.events" :key="item._id">
-        <router-link :to="{ name: 'event', params: { id: item._id } }">
-          {{ item }}
-        </router-link>
+        <router-link :to="{ name: 'event', params: { id: item._id } }">{{
+          item
+        }}</router-link>
         <a @click="deleteEvent(item._id)">
           <span class="icon has-text-danger">
             <i class="fas fa-trash-alt"></i>
@@ -131,15 +131,13 @@
       </div>
 
       <div v-if="isSending === 0" class="control">
-        <a @click="submitFile()" class="button is-info">
-          Envoyer
-        </a>
+        <a @click="submitFile()" class="button is-info">Envoyer</a>
       </div>
 
       <div v-if="isSending === 1" class="control">
         <a class="button is-info">
           Envoi en cours
-          <div class="ld ld-ring ld-spin " style="margin-left: 5px;"></div>
+          <div class="ld ld-ring ld-spin" style="margin-left: 5px;"></div>
         </a>
       </div>
 
@@ -159,8 +157,21 @@
     </div>
 
     <ul>
-      <li v-for="item in this.songsList" :key="item._id">{{ item }}</li>
+      <li v-for="item in this.songsList" :key="item._id">
+        {{ item }}
+        <a @click="deleteSong(item._id)">
+          <span class="icon has-text-danger">
+            <i class="fas fa-trash-alt"></i>
+          </span>
+        </a>
+      </li>
     </ul>
+
+    <div class="field">
+      <div class="control">
+        <button @click="test()" class="button is-link">Lancer</button>
+      </div>
+    </div>
 
     <div class="modal" v-bind:class="{ 'is-active': isActiveEvent }">
       <div class="modal-background"></div>
@@ -256,12 +267,6 @@
 </template>
 
 <script>
-window.onbeforeunload = () => {
-  if (isSending) {
-    return "";
-  }
-};
-
 export default {
   name: "OrganizerTools",
 
@@ -365,6 +370,18 @@ export default {
         });
     },
 
+    deleteSong(id) {
+      axios
+        .delete("songs/" + id)
+        .then((response) => {
+          console.log(response.data);
+          this.loadSongs();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     addMarker(event) {
       console.log(event.latlng);
       if (this.markers.length < 1) {
@@ -406,10 +423,15 @@ export default {
     },
 
     loadEvents() {
-      axios.get("parties/").then((response) => {
-        this.events = response.data;
-        console.log(this.events);
-      });
+      axios
+        .get("parties/")
+        .then((response) => {
+          this.events = response.data;
+          console.log(this.events);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     loadSongs() {
@@ -436,16 +458,25 @@ export default {
 
       axios
         .post("parties/create", eventData)
-        .then((response) => console.log(response.data));
-
-      this.loadEvents();
+        .then((response) => {
+          console.log(response.data);
+          this.loadEvents();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     deleteEvent(id) {
-      axios.delete("parties/" + id).then((response) => {
-        console.log(response.data);
-        this.loadEvents();
-      });
+      axios
+        .delete("parties/" + id)
+        .then((response) => {
+          console.log(response.data);
+          this.loadEvents();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     },
 
     changeEvent(id) {
@@ -487,17 +518,6 @@ export default {
 
   watch: {
     $route(to, from) {},
-  },
-
-  beforeRouteLeave(to, from, next) {
-    const answer = window.confirm(
-      "Do you really want to leave? you have unsaved changes!"
-    );
-    if (answer) {
-      next();
-    } else {
-      next(false);
-    }
   },
 
   mounted() {
