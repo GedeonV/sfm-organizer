@@ -2,9 +2,11 @@
   <div>
     <ul>
       <li v-for="item in this.events" :key="item._id">
-        <router-link :to="{ name: 'event', params: { id: item._id } }">{{
+        <router-link :to="{ name: 'event', params: { id: item._id } }">
+          {{
           item
-        }}</router-link>
+          }}
+        </router-link>
         <a @click="deleteEvent(item._id)">
           <span class="icon has-text-danger">
             <i class="fas fa-trash-alt"></i>
@@ -33,12 +35,7 @@
     <div class="field">
       <label class="label">Nom</label>
       <div class="control">
-        <input
-          class="input"
-          v-model="event_name"
-          type="text"
-          placeholder="Nom de l'événement"
-        />
+        <input class="input" v-model="event_name" type="text" placeholder="Nom de l'événement" />
       </div>
     </div>
 
@@ -59,21 +56,13 @@
       @update:bounds="boundsUpdated"
     >
       <l-tile-layer :url="url"></l-tile-layer>
-      <l-marker
-        v-for="(marker, index) in markers"
-        :lat-lng="marker"
-        :key="index"
-      ></l-marker>
+      <l-marker v-for="(marker, index) in markers" :lat-lng="marker" :key="index"></l-marker>
     </l-map>
 
     <div class="field">
       <label class="label">Description</label>
       <div class="control">
-        <textarea
-          class="textarea"
-          v-model="description"
-          placeholder="Primary textarea"
-        ></textarea>
+        <textarea class="textarea" v-model="description" placeholder="Primary textarea"></textarea>
       </div>
     </div>
 
@@ -92,18 +81,13 @@
     <div class="field">
       <label class="label">Thème</label>
       <div class="control">
-        <input
-          class="input"
-          type="text"
-          v-model="theme"
-          placeholder="Thème de la soirée"
-        />
+        <input class="input" type="text" v-model="theme" placeholder="Thème de la soirée" />
       </div>
     </div>
 
     <div class="field">
       <div class="control">
-        <button @click="submit()" class="button is-link">Submit</button>
+        <button @click="submitForm()" class="button is-link">Submit</button>
       </div>
     </div>
 
@@ -167,11 +151,26 @@
       </li>
     </ul>
 
-    <div class="field">
-      <div class="control">
-        <button @click="test()" class="button is-link">Lancer</button>
-      </div>
-    </div>
+    <hr />
+
+    <label class="label">Liste d'utilisateur</label>
+    <ul>
+      <li v-for="item in this.users" :key="item._id">
+        {{item}}
+        <a v-if="item.rank !== 1" @click="toggleUserRank(item._id, false)">
+          <span class="icon ml-6 has-text-success">
+            Promouvoir
+            <i class="fas ml-1 fa-angle-double-up"></i>
+          </span>
+        </a>
+        <a v-else @click="toggleUserRank(item._id , true)">
+          <span class="icon ml-6 has-text-danger">
+            Rétrograder
+            <i class="fas ml-1 fa-angle-double-down"></i>
+          </span>
+        </a>
+      </li>
+    </ul>
 
     <div class="modal" v-bind:class="{ 'is-active': isActiveEvent }">
       <div class="modal-background"></div>
@@ -181,12 +180,7 @@
         <div class="field">
           <label class="label">Nom</label>
           <div class="control">
-            <input
-              class="input"
-              type="text"
-              v-model="tempName"
-              placeholder="Nom de l'événement"
-            />
+            <input class="input" type="text" v-model="tempName" placeholder="Nom de l'événement" />
           </div>
         </div>
 
@@ -207,21 +201,13 @@
           @update:bounds="boundsUpdated_2"
         >
           <l-tile-layer :url="url_2"></l-tile-layer>
-          <l-marker
-            v-for="(marker, index) in markers_2"
-            :lat-lng="marker"
-            :key="index"
-          ></l-marker>
+          <l-marker v-for="(marker, index) in markers_2" :lat-lng="marker" :key="index"></l-marker>
         </l-map>
 
         <div class="field">
           <label class="label">Description</label>
           <div class="control">
-            <textarea
-              class="textarea"
-              v-model="tempDesc"
-              placeholder="Primary textarea"
-            ></textarea>
+            <textarea class="textarea" v-model="tempDesc" placeholder="Primary textarea"></textarea>
           </div>
         </div>
 
@@ -240,28 +226,17 @@
         <div class="field">
           <label class="label">Thème</label>
           <div class="control">
-            <input
-              class="input"
-              type="text"
-              v-model="tempTheme"
-              placeholder="Thème de la soirée"
-            />
+            <input class="input" type="text" v-model="tempTheme" placeholder="Thème de la soirée" />
           </div>
         </div>
 
         <div class="field">
           <div class="control">
-            <button @click="changeEvent(event_id)" class="button is-link">
-              Submit
-            </button>
+            <button @click="changeEvent(event_id)" class="button is-link">Submit</button>
           </div>
         </div>
       </div>
-      <button
-        class="modal-close is-large"
-        @click="closeModal()"
-        aria-label="close"
-      ></button>
+      <button class="modal-close is-large" @click="closeModal()" aria-label="close"></button>
     </div>
   </div>
 </template>
@@ -306,6 +281,8 @@ export default {
       isEmpty: false,
       songsList: null,
       isSending: 0,
+      //=================//
+      users: [],
     };
   },
 
@@ -370,18 +347,6 @@ export default {
         });
     },
 
-    deleteSong(id) {
-      axios
-        .delete("songs/" + id)
-        .then((response) => {
-          console.log(response.data);
-          this.loadSongs();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    },
-
     addMarker(event) {
       console.log(event.latlng);
       if (this.markers.length < 1) {
@@ -422,12 +387,12 @@ export default {
       this.bounds_2 = bounds;
     },
 
-    loadEvents() {
+    deleteSong(id) {
       axios
-        .get("parties/")
+        .delete("songs/" + id)
         .then((response) => {
-          this.events = response.data;
-          console.log(this.events);
+          console.log(response.data);
+          this.loadSongs();
         })
         .catch((err) => {
           console.log(err);
@@ -446,7 +411,7 @@ export default {
         });
     },
 
-    submit() {
+    submitForm() {
       let eventData = {};
       eventData.event_name = this.event_name;
       eventData.date = this.date;
@@ -497,8 +462,20 @@ export default {
       this.closeModal();
     },
 
+    loadEvents() {
+      axios
+        .get("parties/")
+        .then((response) => {
+          this.events = response.data;
+          console.log(this.events);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
     showModalEvent(id, name, date, location, description, code, theme) {
-      setTimeout(function() {
+      setTimeout(function () {
         window.dispatchEvent(new Event("resize"));
       }, 250); // Aide à charger correctement la map (hack)
       this.isActiveEvent = true;
@@ -514,6 +491,32 @@ export default {
     closeModal() {
       this.isActiveEvent = false;
     },
+
+    toggleUserRank(id, rk) {
+      let rank = null;
+      rk ? (rank = 0) : (rank = 1);
+      axios
+        .put("users/user/" + id + "/rank", { rank: rank })
+        .then((response) => {
+          console.log(response.data);
+          this.loadUsers();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+
+    loadUsers() {
+      axios
+        .get("users/")
+        .then((response) => {
+          console.log(response.data);
+          this.users = response.data;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
   },
 
   watch: {
@@ -524,6 +527,7 @@ export default {
     this.loadEvents();
     this.loadPosition();
     this.loadSongs();
+    this.loadUsers();
     let header = document.createElement("script");
     header.setAttribute(
       "src",
