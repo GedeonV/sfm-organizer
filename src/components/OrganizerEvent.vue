@@ -4,7 +4,6 @@
     <p>Description : {{ event_data.description }}</p>
     <p>Date : {{ event_data.date }}</p>
     <p>Theme : {{ event_data.theme }}</p>
-    <p>Code : {{ event_data.event_code }}</p>
     <p>State: {{ event_data.state }}</p>
 
     <hr />
