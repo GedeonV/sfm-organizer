@@ -99,6 +99,11 @@
 
     <hr />
 
+    <h2 class="title">QRCode</h2>
+    <qrcode :value="this.$route.params.id" :options="{ width: 200 }"></qrcode>
+
+    <hr />
+
     <div v-if="event_data.state == 0">
       <div class="field">
         <div class="control">
@@ -213,7 +218,7 @@ export default {
 
     loadEvent() {
       axios.get("parties/event/" + this.$route.params.id).then((response) => {
-        this.event_data = response.data;
+        this.event_data = response.data.event;
         console.log(this.event_data);
       });
     },
@@ -222,7 +227,7 @@ export default {
       axios
         .get("songs/")
         .then((response) => {
-          this.songsList = response.data;
+          this.songsList = response.data.songs;
           console.log(this.songsList);
         })
         .catch((err) => {

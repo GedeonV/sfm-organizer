@@ -7,11 +7,12 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@chenfengyuan/vue-qrcode": "^1.0.2",
     "axios": "^0.19.2",
     "bulma": "^0.9.0",
     "jsmediatags": "^3.9.3",
     "leaflet": "^1.6.0",
-    "vue": "^2.6.11",
+    "vue": "^2.6.12",
     "vue-router": "^3.2.0",
     "vue2-leaflet": "^2.5.2",
     "vuex": "^3.4.0",
@@ -23,7 +24,7 @@
     "@vue/cli-service": "~4.5.0",
     "node-sass": "^4.12.0",
     "sass-loader": "^8.0.2",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.12"
   },
   "browserslist": [
     "> 1%",

@@ -5,6 +5,8 @@ import store from "./store";
 import axios from "axios";
 import "./../node_modules/bulma/css/bulma.css";
 import "leaflet/dist/leaflet.css";
+import VueQrcode from "@chenfengyuan/vue-qrcode";
+
 import {
   LMap,
   LTileLayer,
@@ -23,6 +25,7 @@ Vue.component("l-marker", LMarker);
 Vue.component("l-control", LControl);
 Vue.component("l-polyline", LPolyline);
 Vue.component("l-popup", LPopup);
+Vue.component(VueQrcode.name, VueQrcode);
 
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
