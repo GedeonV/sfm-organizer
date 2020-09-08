@@ -18,7 +18,6 @@
               item.date,
               item.location,
               item.description,
-              item.event_code,
               item.theme
             )
           "
@@ -49,22 +48,12 @@
       </div>
     </div>
 
-    <l-map
-      @click="addMarker"
-      style="height: 300px; width: 300px"
-      :zoom="zoom"
-      :center="center"
-      @update:zoom="zoomUpdated"
-      @update:center="centerUpdated"
-      @update:bounds="boundsUpdated"
-    >
-      <l-tile-layer :url="url"></l-tile-layer>
-      <l-marker
-        v-for="(marker, index) in markers"
-        :lat-lng="marker"
-        :key="index"
-      ></l-marker>
-    </l-map>
+    <div class="field">
+      <label class="label">Lieux</label>
+      <div class="control">
+        <input class="input" v-model="location" type="text" />
+      </div>
+    </div>
 
     <div class="field">
       <label class="label">Description</label>
@@ -74,18 +63,6 @@
           v-model="description"
           placeholder="Primary textarea"
         ></textarea>
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Code d'accès</label>
-      <div class="control">
-        <input
-          class="input"
-          type="text"
-          v-model="event_code"
-          placeholder="Code pour accéder à la soirée"
-        />
       </div>
     </div>
 
@@ -212,22 +189,12 @@
           </div>
         </div>
 
-        <l-map
-          @click="addMarker_2"
-          style="height: 300px; width: 300px"
-          :zoom="zoom_2"
-          :center="center_2"
-          @update:zoom="zoomUpdated_2"
-          @update:center="centerUpdated_2"
-          @update:bounds="boundsUpdated_2"
-        >
-          <l-tile-layer :url="url_2"></l-tile-layer>
-          <l-marker
-            v-for="(marker, index) in markers_2"
-            :lat-lng="marker"
-            :key="index"
-          ></l-marker>
-        </l-map>
+        <div class="field">
+          <label class="label">Lieux</label>
+          <div class="control">
+            <input class="input" v-model="tempLocation" type="text" />
+          </div>
+        </div>
 
         <div class="field">
           <label class="label">Description</label>
@@ -237,18 +204,6 @@
               v-model="tempDesc"
               placeholder="Primary textarea"
             ></textarea>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">Code d'accès</label>
-          <div class="control">
-            <input
-              class="input"
-              type="text"
-              v-model="tempCode"
-              placeholder="Code pour accéder à la soirée"
-            />
           </div>
         </div>
 
@@ -289,33 +244,19 @@ export default {
     return {
       events: null,
       event_name: "",
-      event_code: "",
       event_id: "",
       theme: "",
       date: null,
-      location: {},
+      location: "",
       description: "",
       isActiveEvent: false,
       //===================//
       tempName: "",
       tempDate: "",
       tempDesc: "",
-      tempCode: "",
       tempTheme: "",
+      tempLocation: "",
       //===================//
-      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      zoom: 7,
-      center: [0, 0],
-      bounds: null,
-      markers: [],
-      map: null,
-      //===================//
-      url_2: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-      zoom_2: 7,
-      center_2: [0, 0],
-      bounds_2: null,
-      markers_2: [],
-      //==================//
       file: {},
       songTags: null,
       isEmpty: false,
@@ -327,15 +268,6 @@ export default {
   },
 
   methods: {
-    loadPosition() {
-      navigator.geolocation.getCurrentPosition((position) => {
-        let lat = position.coords.latitude;
-        let long = position.coords.longitude;
-        this.center = [lat, long];
-        this.center_2 = [lat, long];
-      });
-    },
-
     loadFile(af) {
       const file = af.target.files[0];
       const reader = new FileReader();
@@ -387,46 +319,6 @@ export default {
         });
     },
 
-    addMarker(event) {
-      console.log(event.latlng);
-      if (this.markers.length < 1) {
-        this.markers.push(event.latlng);
-      } else if (this.markers.length != 2) {
-        this.markers.pop();
-        this.markers.push(event.latlng);
-      }
-    },
-
-    zoomUpdated(zoom) {
-      this.zoom = zoom;
-    },
-    centerUpdated(center) {
-      this.center = center;
-    },
-    boundsUpdated(bounds) {
-      this.bounds = bounds;
-    },
-
-    addMarker_2(event) {
-      console.log(event.latlng);
-      if (this.markers_2.length < 1) {
-        this.markers_2.push(event.latlng);
-      } else if (this.markers_2.length != 2) {
-        this.markers_2.pop();
-        this.markers_2.push(event.latlng);
-      }
-    },
-
-    zoomUpdated_2(zoom) {
-      this.zoom_2 = zoom;
-    },
-    centerUpdated_2(center) {
-      this.center_2 = center;
-    },
-    boundsUpdated_2(bounds) {
-      this.bounds_2 = bounds;
-    },
-
     deleteSong(id) {
       axios
         .delete("songs/" + id)
@@ -455,10 +347,9 @@ export default {
       let eventData = {};
       eventData.event_name = this.event_name;
       eventData.date = this.date;
-      eventData.location = this.markers;
+      eventData.location = this.location;
       eventData.description = this.description;
       eventData.state = 0;
-      eventData.event_code = this.event_code;
       eventData.theme = this.theme;
 
       axios
@@ -489,10 +380,9 @@ export default {
       let UpdatedData = {};
       UpdatedData.event_name = this.tempName;
       UpdatedData.date = this.tempDate;
-      UpdatedData.location = this.markers_2;
+      UpdatedData.location = this.tempLocation;
       UpdatedData.description = this.tempDesc;
       UpdatedData.state = 0;
-      UpdatedData.event_code = this.tempCode;
       UpdatedData.theme = this.tempTheme;
       console.log(UpdatedData);
       axios.put("parties/event/" + id, UpdatedData).then((response) => {
@@ -514,7 +404,7 @@ export default {
         });
     },
 
-    showModalEvent(id, name, date, location, description, code, theme) {
+    showModalEvent(id, name, date, location, description, theme) {
       setTimeout(function() {
         window.dispatchEvent(new Event("resize"));
       }, 250); // Aide à charger correctement la map (hack)
@@ -522,10 +412,8 @@ export default {
       this.event_id = id;
       this.tempName = name;
       this.tempDate = date.slice(0, 10);
-      this.markers_2 = location;
-      console.log(location);
+      this.tempLocation = location;
       this.tempDesc = description;
-      this.tempCode = code;
       this.tempTheme = theme;
     },
     closeModal() {
@@ -565,7 +453,6 @@ export default {
 
   mounted() {
     this.loadEvents();
-    this.loadPosition();
     this.loadSongs();
     this.loadUsers();
     let header = document.createElement("script");
