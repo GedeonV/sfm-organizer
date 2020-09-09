@@ -1,5 +1,7 @@
 <template>
   <div>
+    <!-- //======= Description de l'évènement =======// -->
+
     <h1 class="title">{{ event_data.event_name }}</h1>
     <p>Description : {{ event_data.description }}</p>
     <p>Date : {{ event_data.date }}</p>
@@ -7,6 +9,7 @@
     <p>State: {{ event_data.state }}</p>
 
     <hr />
+    <!-- //======= Liste d'inscrits =======// -->
 
     <h2 class="title">Inscriptions</h2>
     <ul>
@@ -17,10 +20,11 @@
             <i class="fas fa-trash-alt"></i>
           </span>
         </a>
+        <hr />
       </li>
     </ul>
 
-    <hr />
+    <!-- //======= Formulaire d'envoie de chansons =======// -->
 
     <h2 class="title">Chansons</h2>
     <label class="label">Ajouter une musique au catalogue</label>
@@ -46,15 +50,13 @@
       </div>
 
       <div v-if="isSending === 0" class="control">
-        <a @click="submitFile()" class="button is-info">
-          Envoyer
-        </a>
+        <a @click="submitFile()" class="button is-info">Envoyer</a>
       </div>
 
       <div v-if="isSending === 1" class="control">
         <a class="button is-info">
           Envoi en cours
-          <div class="ld ld-ring ld-spin " style="margin-left: 5px;"></div>
+          <div class="ld ld-ring ld-spin" style="margin-left: 5px;"></div>
         </a>
       </div>
 
@@ -73,6 +75,41 @@
       </div>
     </div>
 
+    <!-- //======= Formulaire d'informations manquantes =======// -->
+
+    <div v-if="isMissing">
+      <p>Informations manquantes</p>
+      <div class="field">
+        <label class="label">Titre</label>
+        <div class="control">
+          <input class="input" type="text" v-model="title" placeholder="Titre de la chanson" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Artiste</label>
+        <div class="control">
+          <input class="input" type="text" v-model="artist" placeholder="Interprète de la chanson" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Album</label>
+        <div class="control">
+          <input class="input" type="text" v-model="album" placeholder="Nom de l'album" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Année</label>
+        <div class="control">
+          <input class="input" type="text" v-model="year" placeholder="Année de réalisation" />
+        </div>
+      </div>
+      <div class="control">
+        <button @click="submitChange" class="button is-primary">Submit</button>
+      </div>
+    </div>
+
+    <!-- //======= Liste de chansons de l'évènement =======// -->
+
     <label class="label">Chansons selectionnée</label>
     <ul>
       <li v-for="item in this.event_data.songs" v-bind:key="item._id">
@@ -82,26 +119,32 @@
             <i class="fas fa-trash-alt"></i>
           </span>
         </a>
+        <hr />
       </li>
     </ul>
+
+    <!-- //======= Catalogue de Chansons =======// -->
+
     <label class="label">Catalogue</label>
     <ul>
       <li v-for="item in this.songsList" :key="item._id">
         {{ item
-        }}<a @click="addSong(item._id)">
+        }}
+        <a @click="addSong(item._id)">
           <span class="icon has-text-success">
             <i class="fas fa-plus"></i>
           </span>
         </a>
+        <hr />
       </li>
     </ul>
 
-    <hr />
+    <!-- //======= QRCode =======// -->
 
     <h2 class="title">QRCode</h2>
     <qrcode :value="this.$route.params.id" :options="{ width: 200 }"></qrcode>
 
-    <hr />
+    <!-- //======= Boutton de lancement =======// -->
 
     <div v-if="event_data.state == 0">
       <div class="field">
@@ -120,9 +163,7 @@
     <div v-if="event_data.state == 2">
       <div class="field">
         <div class="control">
-          <button @click="startEvent()" class="button is-success">
-            Recommencer
-          </button>
+          <button @click="startEvent()" class="button is-success">Recommencer</button>
         </div>
       </div>
     </div>
@@ -136,13 +177,20 @@ export default {
     return {
       event_data: {},
       songsList: {},
+      songListTemp: [],
       file: {},
       songTags: null,
       isEmpty: false,
-      songsList: null,
+      songsList: [],
       isSending: 0,
+      isMissing: 0,
+      title: "",
+      artist: "",
+      album: "",
+      year: "",
     };
   },
+
   methods: {
     startEvent() {
       axios
@@ -171,10 +219,29 @@ export default {
           console.log(tag.tags);
           this.isSending = 0;
           this.songTags = new FormData();
-          this.songTags.append("title", tag.tags.title);
-          this.songTags.append("artist", tag.tags.artist);
-          this.songTags.append("album", tag.tags.album);
-          this.songTags.append("date", tag.tags.year);
+          if (
+            !tag.tags.artist ||
+            !tag.tags.title ||
+            !tag.tags.album ||
+            !tag.tags.year
+          ) {
+            console.log("Informations manquante");
+            console.log(tag.tags.title);
+            console.log(tag.tags.artist);
+            console.log(tag.tags.album);
+            console.log(tag.tags.year);
+            this.isMissing = 1;
+            this.title = tag.tags.title;
+            this.artist = tag.tags.artist;
+            this.album = tag.tags.album;
+            this.year = tag.tags.year;
+          } else {
+            this.isMissing = 0;
+            this.songTags.append("title", tag.tags.title);
+            this.songTags.append("artist", tag.tags.artist);
+            this.songTags.append("album", tag.tags.album);
+            this.songTags.append("date", tag.tags.year);
+          }
           this.songTags.append("songFile", this.file);
         },
         onError: (error) => {
@@ -187,6 +254,14 @@ export default {
       reader.onload = (e) => {
         this.$emit("load", e.target.result);
       };
+    },
+
+    submitChange() {
+      this.songTags.append("title", this.title);
+      this.songTags.append("artist", this.artist);
+      this.songTags.append("album", this.album);
+      this.songTags.append("date", this.year);
+      this.isMissing = 0;
     },
 
     submitFile() {
@@ -206,7 +281,7 @@ export default {
             this.isSending = 2;
             console.log(response.data.song._id);
             this.addSong(response.data.song._id);
-            this.loadSongs();
+            this.loadEvent();
           }
         })
         .catch((err) => {
@@ -219,6 +294,7 @@ export default {
       axios.get("parties/event/" + this.$route.params.id).then((response) => {
         this.event_data = response.data.event;
         console.log(this.event_data);
+        this.loadSongs();
       });
     },
 
@@ -228,10 +304,27 @@ export default {
         .then((response) => {
           this.songsList = response.data.songs;
           console.log(this.songsList);
+          this.checkSongs();
         })
         .catch((err) => {
           console.log(err);
         });
+    },
+
+    checkSongs() {
+      console.log(this.event_data.songs.length);
+      for (let i = 0, len = this.event_data.songs.length; i < len; i++) {
+        for (let j = 0, len2 = this.songsList.length; j < len2; j++) {
+          if (this.songsList[j]._id == this.event_data.songs[i]._id) {
+            console.log("Trouver");
+            console.log(this.songsList[i]._id);
+            this.songsList.splice(j, 1);
+            len2 = this.songsList.length;
+          } else {
+            console.log("pas trouver");
+          }
+        }
+      }
     },
 
     deleteUser(id) {
@@ -267,19 +360,22 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.loadEvent();
+          this.checkSongs();
         })
         .catch((err) => {
           console.log(err);
         });
     },
   },
+
   watch: {
     $route(to, from) {},
   },
+
   mounted() {
     if (this.$route.params.id) {
       this.loadEvent();
-      this.loadSongs();
+
       let header = document.createElement("script");
       header.setAttribute(
         "src",

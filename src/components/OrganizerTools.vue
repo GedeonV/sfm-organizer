@@ -1,10 +1,9 @@
 <template>
   <div>
+    <!-- //======= Liste des Evènements =======// -->
     <ul>
       <li v-for="item in this.events" :key="item._id">
-        <router-link :to="{ name: 'event', params: { id: item._id } }">
-          {{ item }}
-        </router-link>
+        <router-link :to="{ name: 'event', params: { id: item._id } }">{{ item }}</router-link>
         <a @click="deleteEvent(item._id)">
           <span class="icon has-text-danger">
             <i class="fas fa-trash-alt"></i>
@@ -26,18 +25,16 @@
             <i class="fas fa-edit"></i>
           </span>
         </a>
+        <hr />
       </li>
     </ul>
-    <hr />
+
+    <!-- //======= Formulaire de création d'évènement =======// -->
+
     <div class="field">
       <label class="label">Nom</label>
       <div class="control">
-        <input
-          class="input"
-          v-model="event_name"
-          type="text"
-          placeholder="Nom de l'événement"
-        />
+        <input class="input" v-model="event_name" type="text" placeholder="Nom de l'événement" />
       </div>
     </div>
 
@@ -58,23 +55,14 @@
     <div class="field">
       <label class="label">Description</label>
       <div class="control">
-        <textarea
-          class="textarea"
-          v-model="description"
-          placeholder="Primary textarea"
-        ></textarea>
+        <textarea class="textarea" v-model="description" placeholder="Primary textarea"></textarea>
       </div>
     </div>
 
     <div class="field">
       <label class="label">Thème</label>
       <div class="control">
-        <input
-          class="input"
-          type="text"
-          v-model="theme"
-          placeholder="Thème de la soirée"
-        />
+        <input class="input" type="text" v-model="theme" placeholder="Thème de la soirée" />
       </div>
     </div>
 
@@ -85,6 +73,8 @@
     </div>
 
     <hr />
+    <!-- //======= Formulaire d'ajout de musique =======// -->
+
     <label class="label">Ajouter une musique au catalogue</label>
     <div class="field has-addons is-grouped">
       <div class="file has-name">
@@ -94,7 +84,7 @@
             @change="loadFile"
             type="file"
             name="resume"
-            :disabled="isSending === 1"
+            :disabled="isSending === 1 "
           />
           <span class="file-cta">
             <span class="file-icon">
@@ -108,7 +98,11 @@
       </div>
 
       <div v-if="isSending === 0" class="control">
-        <a @click="submitFile()" class="button is-info">Envoyer</a>
+        <a
+          @click="submitFile()"
+          :disabled=" isSending === 1 || isMissing === 1"
+          class="button is-info"
+        >Envoyer</a>
       </div>
 
       <div v-if="isSending === 1" class="control">
@@ -133,6 +127,42 @@
       </div>
     </div>
 
+    <!-- //======= Formulaire d'informations manquantes =======// -->
+
+    <div v-if="isMissing">
+      <p>Informations manquantes</p>
+      <div class="field">
+        <label class="label">Titre</label>
+        <div class="control">
+          <input class="input" type="text" v-model="title" placeholder="Titre de la chanson" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Artiste</label>
+        <div class="control">
+          <input class="input" type="text" v-model="artist" placeholder="Interprète de la chanson" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Album</label>
+        <div class="control">
+          <input class="input" type="text" v-model="album" placeholder="Nom de l'album" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Année</label>
+        <div class="control">
+          <input class="input" type="text" v-model="year" placeholder="Année de réalisation" />
+        </div>
+      </div>
+      <div class="control">
+        <button @click="submitChange" class="button is-primary">Submit</button>
+      </div>
+    </div>
+
+    <hr />
+    <!-- //======= Liste des Chansons du catalogue =======// -->
+
     <ul>
       <li v-for="item in this.songsList" :key="item._id">
         {{ item }}
@@ -141,12 +171,13 @@
             <i class="fas fa-trash-alt"></i>
           </span>
         </a>
+        <hr />
       </li>
     </ul>
 
-    <hr />
+    <!-- //======= Liste d'utilisateurs =======// -->
 
-    <label class="label">Liste d'utilisateur</label>
+    <label class="label">Liste d'utilisateurs</label>
     <ul>
       <li v-for="item in this.users" :key="item._id">
         {{ item }}
@@ -162,8 +193,11 @@
             <i class="fas ml-1 fa-angle-double-down"></i>
           </span>
         </a>
+        <hr />
       </li>
     </ul>
+
+    <!-- //======= Modal modif évènements =======// -->
 
     <div class="modal" v-bind:class="{ 'is-active': isActiveEvent }">
       <div class="modal-background"></div>
@@ -173,12 +207,7 @@
         <div class="field">
           <label class="label">Nom</label>
           <div class="control">
-            <input
-              class="input"
-              type="text"
-              v-model="tempName"
-              placeholder="Nom de l'événement"
-            />
+            <input class="input" type="text" v-model="tempName" placeholder="Nom de l'événement" />
           </div>
         </div>
 
@@ -199,39 +228,24 @@
         <div class="field">
           <label class="label">Description</label>
           <div class="control">
-            <textarea
-              class="textarea"
-              v-model="tempDesc"
-              placeholder="Primary textarea"
-            ></textarea>
+            <textarea class="textarea" v-model="tempDesc" placeholder="Primary textarea"></textarea>
           </div>
         </div>
 
         <div class="field">
           <label class="label">Thème</label>
           <div class="control">
-            <input
-              class="input"
-              type="text"
-              v-model="tempTheme"
-              placeholder="Thème de la soirée"
-            />
+            <input class="input" type="text" v-model="tempTheme" placeholder="Thème de la soirée" />
           </div>
         </div>
 
         <div class="field">
           <div class="control">
-            <button @click="changeEvent(event_id)" class="button is-link">
-              Submit
-            </button>
+            <button @click="changeEvent(event_id)" class="button is-link">Submit</button>
           </div>
         </div>
       </div>
-      <button
-        class="modal-close is-large"
-        @click="closeModal()"
-        aria-label="close"
-      ></button>
+      <button class="modal-close is-large" @click="closeModal()" aria-label="close"></button>
     </div>
   </div>
 </template>
@@ -242,6 +256,7 @@ export default {
 
   data() {
     return {
+      //=========Variables Evènements==========//
       events: null,
       event_name: "",
       event_id: "",
@@ -250,19 +265,24 @@ export default {
       location: "",
       description: "",
       isActiveEvent: false,
-      //===================//
+      //=========Variables Formulaire Modal==========//
       tempName: "",
       tempDate: "",
       tempDesc: "",
       tempTheme: "",
       tempLocation: "",
-      //===================//
+      //=========Variables Chansons==========//
       file: {},
       songTags: null,
       isEmpty: false,
       songsList: null,
       isSending: 0,
-      //=================//
+      isMissing: 0,
+      title: "",
+      artist: "",
+      album: "",
+      year: "",
+      //=========Variables liste Utilisateurs==========//
       users: [],
     };
   },
@@ -277,10 +297,29 @@ export default {
           console.log(tag.tags);
           this.isSending = 0;
           this.songTags = new FormData();
-          this.songTags.append("title", tag.tags.title);
-          this.songTags.append("artist", tag.tags.artist);
-          this.songTags.append("album", tag.tags.album);
-          this.songTags.append("date", tag.tags.year);
+          if (
+            !tag.tags.artist ||
+            !tag.tags.title ||
+            !tag.tags.album ||
+            !tag.tags.year
+          ) {
+            console.log("Informations manquante");
+            console.log(tag.tags.title);
+            console.log(tag.tags.artist);
+            console.log(tag.tags.album);
+            console.log(tag.tags.year);
+            this.isMissing = 1;
+            this.title = tag.tags.title;
+            this.artist = tag.tags.artist;
+            this.album = tag.tags.album;
+            this.year = tag.tags.year;
+          } else {
+            this.isMissing = 0;
+            this.songTags.append("title", tag.tags.title);
+            this.songTags.append("artist", tag.tags.artist);
+            this.songTags.append("album", tag.tags.album);
+            this.songTags.append("date", tag.tags.year);
+          }
           this.songTags.append("songFile", this.file);
         },
         onError: (error) => {
@@ -293,6 +332,14 @@ export default {
       reader.onload = (e) => {
         this.$emit("load", e.target.result);
       };
+    },
+
+    submitChange() {
+      this.songTags.append("title", this.title);
+      this.songTags.append("artist", this.artist);
+      this.songTags.append("album", this.album);
+      this.songTags.append("date", this.year);
+      this.isMissing = 0;
     },
 
     submitFile() {
@@ -405,9 +452,6 @@ export default {
     },
 
     showModalEvent(id, name, date, location, description, theme) {
-      setTimeout(function() {
-        window.dispatchEvent(new Event("resize"));
-      }, 250); // Aide à charger correctement la map (hack)
       this.isActiveEvent = true;
       this.event_id = id;
       this.tempName = name;
@@ -470,7 +514,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 .modal {
   z-index: 1000;
