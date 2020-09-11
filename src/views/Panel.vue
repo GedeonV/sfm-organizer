@@ -1,18 +1,16 @@
 <template>
-	<div class="container">
-    	<OrganizerTools/>
-	</div>
+  <OrganizerTools />
 </template>
 
 
 <script>
 // @ is an alias to /src
-	import OrganizerTools from '@/components/OrganizerTools'
+import OrganizerTools from "@/components/OrganizerTools";
 
-	export default {
-	  name: 'Panel',
-	  components: {
-	    OrganizerTools
-	  },
-	}
+export default {
+  name: "Panel",
+  components: {
+    OrganizerTools,
+  },
+};
 </script>

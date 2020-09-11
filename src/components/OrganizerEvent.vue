@@ -128,8 +128,7 @@
     <label class="label">Catalogue</label>
     <ul>
       <li v-for="item in this.songsList" :key="item._id">
-        {{ item
-        }}
+        {{ item }}
         <a @click="addSong(item._id)">
           <span class="icon has-text-success">
             <i class="fas fa-plus"></i>
@@ -394,6 +393,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
+@import "../assets/scss/style.scss";
 .modal {
   z-index: 1000;
 }

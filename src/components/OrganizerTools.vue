@@ -1,16 +1,62 @@
 <template>
-  <div>
-    <!-- //======= Liste des Evènements =======// -->
-    <ul>
-      <li v-for="item in this.events" :key="item._id">
-        <router-link :to="{ name: 'event', params: { id: item._id } }">{{ item }}</router-link>
-        <a @click="deleteEvent(item._id)">
-          <span class="icon has-text-danger">
-            <i class="fas fa-trash-alt"></i>
-          </span>
-        </a>
-        <a
-          @click="
+  <div class="columns">
+    <aside class="column is-one-fifth">
+      <p class="menu-label">General</p>
+      <ul class="menu-list">
+        <li>
+          <a>Dashboard</a>
+        </li>
+        <li>
+          <a>Customers</a>
+        </li>
+      </ul>
+      <p class="menu-label">Administration</p>
+      <ul class="menu-list">
+        <li>
+          <a>Team Settings</a>
+        </li>
+        <li>
+          <a class="is-active">Manage Your Team</a>
+        </li>
+        <li>
+          <a>Invitations</a>
+        </li>
+        <li>
+          <a>Cloud Storage Environment Settings</a>
+        </li>
+        <li>
+          <a>Authentication</a>
+        </li>
+      </ul>
+      <p class="menu-label">Transactions</p>
+      <ul class="menu-list">
+        <li>
+          <a>Payments</a>
+        </li>
+        <li>
+          <a>Transfers</a>
+        </li>
+        <li>
+          <a>Balance</a>
+        </li>
+      </ul>
+    </aside>
+    <div class="container column">
+      <!-- //======= Liste des Evènements =======// -->
+      <ul>
+        <li v-for="item in this.events" :key="item._id">
+          <router-link :to="{ name: 'event', params: { id: item._id } }">
+            {{
+            item
+            }}
+          </router-link>
+          <a @click="deleteEvent(item._id)">
+            <span class="icon has-text-danger">
+              <i class="fas fa-trash-alt"></i>
+            </span>
+          </a>
+          <a
+            @click="
             showModalEvent(
               item._id,
               item.event_name,
@@ -20,232 +66,238 @@
               item.theme
             )
           "
-        >
-          <span class="icon has-text-success">
-            <i class="fas fa-edit"></i>
-          </span>
-        </a>
-        <hr />
-      </li>
-    </ul>
-
-    <!-- //======= Formulaire de création d'évènement =======// -->
-
-    <div class="field">
-      <label class="label">Nom</label>
-      <div class="control">
-        <input class="input" v-model="event_name" type="text" placeholder="Nom de l'événement" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Date</label>
-      <div class="control">
-        <input class="input" v-model="date" type="date" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Lieux</label>
-      <div class="control">
-        <input class="input" v-model="location" type="text" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Description</label>
-      <div class="control">
-        <textarea class="textarea" v-model="description" placeholder="Primary textarea"></textarea>
-      </div>
-    </div>
-
-    <div class="field">
-      <label class="label">Thème</label>
-      <div class="control">
-        <input class="input" type="text" v-model="theme" placeholder="Thème de la soirée" />
-      </div>
-    </div>
-
-    <div class="field">
-      <div class="control">
-        <button @click="submitForm()" class="button is-link">Submit</button>
-      </div>
-    </div>
-
-    <hr />
-    <!-- //======= Formulaire d'ajout de musique =======// -->
-
-    <label class="label">Ajouter une musique au catalogue</label>
-    <div class="field has-addons is-grouped">
-      <div class="file has-name">
-        <label class="file-label">
-          <input
-            class="file-input"
-            @change="loadFile"
-            type="file"
-            name="resume"
-            :disabled="isSending === 1 "
-          />
-          <span class="file-cta">
-            <span class="file-icon">
-              <i class="fas fa-upload"></i>
+          >
+            <span class="icon has-text-success">
+              <i class="fas fa-edit"></i>
             </span>
-            <span class="file-label">Choisir un fichier</span>
-          </span>
-          <span v-if="isEmpty" class="file-name">{{ this.file.name }}</span>
-          <span v-else class="file-name">Aucun fichier choisi</span>
-        </label>
-      </div>
+          </a>
+          <hr />
+        </li>
+      </ul>
 
-      <div v-if="isSending === 0" class="control">
-        <a
-          @click="submitFile()"
-          :disabled=" isSending === 1 || isMissing === 1"
-          class="button is-info"
-        >Envoyer</a>
-      </div>
+      <!-- //======= Formulaire de création d'évènement =======// -->
 
-      <div v-if="isSending === 1" class="control">
-        <a class="button is-info">
-          Envoi en cours
-          <div class="ld ld-ring ld-spin" style="margin-left: 5px;"></div>
-        </a>
-      </div>
-
-      <div v-if="isSending === 2" class="control">
-        <a class="button is-success">
-          Fichier Envoyer
-          <i class="fas fa-check" style="margin-left: 5px ;"></i>
-        </a>
-      </div>
-
-      <div v-if="isSending === 3" class="control">
-        <a class="button is-danger">
-          Erreur
-          <i class="fas fa-times" style="margin-left: 5px ;"></i>
-        </a>
-      </div>
-    </div>
-
-    <!-- //======= Formulaire d'informations manquantes =======// -->
-
-    <div v-if="isMissing">
-      <p>Informations manquantes</p>
       <div class="field">
-        <label class="label">Titre</label>
+        <label class="label">Nom</label>
         <div class="control">
-          <input class="input" type="text" v-model="title" placeholder="Titre de la chanson" />
+          <input class="input" v-model="event_name" type="text" placeholder="Nom de l'événement" />
         </div>
       </div>
+
       <div class="field">
-        <label class="label">Artiste</label>
+        <label class="label">Date</label>
         <div class="control">
-          <input class="input" type="text" v-model="artist" placeholder="Interprète de la chanson" />
+          <input class="input" v-model="date" type="date" />
         </div>
       </div>
+
       <div class="field">
-        <label class="label">Album</label>
+        <label class="label">Lieux</label>
         <div class="control">
-          <input class="input" type="text" v-model="album" placeholder="Nom de l'album" />
+          <input class="input" v-model="location" type="text" />
         </div>
       </div>
+
       <div class="field">
-        <label class="label">Année</label>
+        <label class="label">Description</label>
         <div class="control">
-          <input class="input" type="text" v-model="year" placeholder="Année de réalisation" />
+          <textarea class="textarea" v-model="description" placeholder="Primary textarea"></textarea>
         </div>
       </div>
-      <div class="control">
-        <button @click="submitChange" class="button is-primary">Submit</button>
-      </div>
-    </div>
 
-    <hr />
-    <!-- //======= Liste des Chansons du catalogue =======// -->
-
-    <ul>
-      <li v-for="item in this.songsList" :key="item._id">
-        {{ item }}
-        <a @click="deleteSong(item._id)">
-          <span class="icon has-text-danger">
-            <i class="fas fa-trash-alt"></i>
-          </span>
-        </a>
-        <hr />
-      </li>
-    </ul>
-
-    <!-- //======= Liste d'utilisateurs =======// -->
-
-    <label class="label">Liste d'utilisateurs</label>
-    <ul>
-      <li v-for="item in this.users" :key="item._id">
-        {{ item }}
-        <a v-if="item.rank !== 1" @click="toggleUserRank(item._id, false)">
-          <span class="icon ml-6 has-text-success">
-            Promouvoir
-            <i class="fas ml-1 fa-angle-double-up"></i>
-          </span>
-        </a>
-        <a v-else @click="toggleUserRank(item._id, true)">
-          <span class="icon ml-6 has-text-danger">
-            Rétrograder
-            <i class="fas ml-1 fa-angle-double-down"></i>
-          </span>
-        </a>
-        <hr />
-      </li>
-    </ul>
-
-    <!-- //======= Modal modif évènements =======// -->
-
-    <div class="modal" v-bind:class="{ 'is-active': isActiveEvent }">
-      <div class="modal-background"></div>
-      <div class="modal-content">
-        <h1 class="title has-text-white">Changements :</h1>
-
-        <div class="field">
-          <label class="label">Nom</label>
-          <div class="control">
-            <input class="input" type="text" v-model="tempName" placeholder="Nom de l'événement" />
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">Date</label>
-          <div class="control">
-            <input class="input" v-model="tempDate" type="date" />
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">Lieux</label>
-          <div class="control">
-            <input class="input" v-model="tempLocation" type="text" />
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">Description</label>
-          <div class="control">
-            <textarea class="textarea" v-model="tempDesc" placeholder="Primary textarea"></textarea>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">Thème</label>
-          <div class="control">
-            <input class="input" type="text" v-model="tempTheme" placeholder="Thème de la soirée" />
-          </div>
-        </div>
-
-        <div class="field">
-          <div class="control">
-            <button @click="changeEvent(event_id)" class="button is-link">Submit</button>
-          </div>
+      <div class="field">
+        <label class="label">Thème</label>
+        <div class="control">
+          <input class="input" type="text" v-model="theme" placeholder="Thème de la soirée" />
         </div>
       </div>
-      <button class="modal-close is-large" @click="closeModal()" aria-label="close"></button>
+
+      <div class="field">
+        <div class="control">
+          <button @click="submitForm()" class="button is-link">Submit</button>
+        </div>
+      </div>
+
+      <hr />
+      <!-- //======= Formulaire d'ajout de musique =======// -->
+
+      <label class="label">Ajouter une musique au catalogue</label>
+      <div class="field has-addons is-grouped">
+        <div class="file has-name">
+          <label class="file-label">
+            <input
+              class="file-input"
+              @change="loadFile"
+              type="file"
+              name="resume"
+              :disabled="isSending === 1"
+            />
+            <span class="file-cta">
+              <span class="file-icon">
+                <i class="fas fa-upload"></i>
+              </span>
+              <span class="file-label">Choisir un fichier</span>
+            </span>
+            <span v-if="isEmpty" class="file-name">{{ this.file.name }}</span>
+            <span v-else class="file-name">Aucun fichier choisi</span>
+          </label>
+        </div>
+
+        <div v-if="isSending === 0" class="control">
+          <a
+            @click="submitFile()"
+            :disabled="isSending === 1 || isMissing === 1"
+            class="button is-info"
+          >Envoyer</a>
+        </div>
+
+        <div v-if="isSending === 1" class="control">
+          <a class="button is-info">
+            Envoi en cours
+            <div class="ld ld-ring ld-spin" style="margin-left: 5px;"></div>
+          </a>
+        </div>
+
+        <div v-if="isSending === 2" class="control">
+          <a class="button is-success">
+            Fichier Envoyer
+            <i class="fas fa-check" style="margin-left: 5px ;"></i>
+          </a>
+        </div>
+
+        <div v-if="isSending === 3" class="control">
+          <a class="button is-danger">
+            Erreur
+            <i class="fas fa-times" style="margin-left: 5px ;"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- //======= Formulaire d'informations manquantes =======// -->
+
+      <div v-if="isMissing">
+        <p>Informations manquantes</p>
+        <div class="field">
+          <label class="label">Titre</label>
+          <div class="control">
+            <input class="input" type="text" v-model="title" placeholder="Titre de la chanson" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Artiste</label>
+          <div class="control">
+            <input
+              class="input"
+              type="text"
+              v-model="artist"
+              placeholder="Interprète de la chanson"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Album</label>
+          <div class="control">
+            <input class="input" type="text" v-model="album" placeholder="Nom de l'album" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Année</label>
+          <div class="control">
+            <input class="input" type="text" v-model="year" placeholder="Année de réalisation" />
+          </div>
+        </div>
+        <div class="control">
+          <button @click="submitChange" class="button is-primary">Submit</button>
+        </div>
+      </div>
+
+      <hr />
+      <!-- //======= Liste des Chansons du catalogue =======// -->
+
+      <ul>
+        <li v-for="item in this.songsList" :key="item._id">
+          {{ item }}
+          <a @click="deleteSong(item._id)">
+            <span class="icon has-text-danger">
+              <i class="fas fa-trash-alt"></i>
+            </span>
+          </a>
+          <hr />
+        </li>
+      </ul>
+
+      <!-- //======= Liste d'utilisateurs =======// -->
+
+      <label class="label">Liste d'utilisateurs</label>
+      <ul>
+        <li v-for="item in this.users" :key="item._id">
+          {{ item }}
+          <a v-if="item.rank !== 1" @click="toggleUserRank(item._id, false)">
+            <span class="icon ml-6 has-text-success">
+              Promouvoir
+              <i class="fas ml-1 fa-angle-double-up"></i>
+            </span>
+          </a>
+          <a v-else @click="toggleUserRank(item._id, true)">
+            <span class="icon ml-6 has-text-danger">
+              Rétrograder
+              <i class="fas ml-1 fa-angle-double-down"></i>
+            </span>
+          </a>
+          <hr />
+        </li>
+      </ul>
+
+      <!-- //======= Modal modif évènements =======// -->
+
+      <div class="modal" v-bind:class="{ 'is-active': isActiveEvent }">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+          <h1 class="title has-text-white">Changements :</h1>
+
+          <div class="field">
+            <label class="label">Nom</label>
+            <div class="control">
+              <input class="input" type="text" v-model="tempName" placeholder="Nom de l'événement" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Date</label>
+            <div class="control">
+              <input class="input" v-model="tempDate" type="date" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Lieux</label>
+            <div class="control">
+              <input class="input" v-model="tempLocation" type="text" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Description</label>
+            <div class="control">
+              <textarea class="textarea" v-model="tempDesc" placeholder="Primary textarea"></textarea>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Thème</label>
+            <div class="control">
+              <input class="input" type="text" v-model="tempTheme" placeholder="Thème de la soirée" />
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="control">
+              <button @click="changeEvent(event_id)" class="button is-link">Submit</button>
+            </div>
+          </div>
+        </div>
+        <button class="modal-close is-large" @click="closeModal()" aria-label="close"></button>
+      </div>
     </div>
   </div>
 </template>
@@ -404,6 +456,11 @@ export default {
         .then((response) => {
           console.log(response.data);
           this.loadEvents();
+          this.event_name = "";
+          this.date = "";
+          this.location = "";
+          this.description = "";
+          this.theme = "";
         })
         .catch((err) => {
           console.log(err);
@@ -515,6 +572,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@import "../assets/scss/style.scss";
 .modal {
   z-index: 1000;
 }
