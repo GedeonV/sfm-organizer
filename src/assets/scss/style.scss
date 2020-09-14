@@ -16,17 +16,38 @@ $widescreen-enabled: false;
 $fullhd-enabled: false;
 
 // Update some of Bulma's component variables
-$card-color: $beige-lighter;
 $label-color: $beige-lighter;
-$input-background-color: $grey-lighter;
-$input-color: $beige-lighter;
+
+$card-color: $beige-lighter;
 $card-background-color: $grey-dark;
 $card-header-color: $beige-lighter;
 $card-header-background-color: $grey-lighter;
+$card-footer-background-color: $grey-lighter;
+$card-footer-border-top: 1px solid $grey-light;
+
 $body-background-color: $grey-dark;
+
 $control-border-width: 2px;
+
+$input-background-color: $grey-lighter;
+$input-color: $beige-lighter;
 $input-border-color: transparent;
 $input-shadow: none;
+
 $navbar-background-color: $grey-dark;
 $navbar-item-color: $beige-lighter;
 $navbar-item-hover-background-color: $grey-light;
+
+$menu-item-color: $beige-lighter;
+$menu-item-hover-color: $blue;
+$menu-item-active-background-color: $blue;
+$menu-item-hover-background-color: $grey-lighter;
+
+$footer-background-color: $grey-dark;
+$footer-color: $beige-lighter;
+
+$table-color: $beige-lighter;
+$table-background-color: $grey-light;
+$table-head-cell-color: $beige-lighter;
+$table-foot-cell-color: $beige-lighter;
+$table-row-hover-background-color: $grey-dark;

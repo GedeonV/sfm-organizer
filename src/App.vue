@@ -75,11 +75,13 @@ div#app {
   text-align: center;
   color: #dfdde0;
   height: 100vh;
+  min-height: 100%;
+  position: relative;
   background-color: #36393f;
 }
 
 nav.navbar {
-  margin-bottom: 2em;
+  border-bottom: 1px solid black;
 }
 
 label {
