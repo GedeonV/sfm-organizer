@@ -1,168 +1,242 @@
 <template>
   <div>
-    <!-- //======= Description de l'évènement =======// -->
+    <div class="container">
+      <!-- //======= Description de l'évènement =======// -->
+      <div class="event mt-6">
+        <div class="desc">
+          <h1 class="title mb-1">{{ event_data.event_name }}</h1>
+          <p class="mb-4" v-if="event_data.state === 1">
+            <span class="tag is-success">Evènement commencé</span>
+          </p>
+          <p class="mb-4" v-if="event_data.state === 0">
+            <span class="tag is-link">Evènement non commencé</span>
+          </p>
+          <p class="mb-4" v-if="event_data.state === 2">
+            <span class="tag is-danger">Evènement terminé</span>
+          </p>
+          <p>{{ event_data.description }}</p>
+          <p>{{ getDate(event_data.date) }}</p>
+          <p>Theme : {{ event_data.theme }}</p>
 
-    <h1 class="title">{{ event_data.event_name }}</h1>
-    <p>Description : {{ event_data.description }}</p>
-    <p>Date : {{ event_data.date }}</p>
-    <p>Theme : {{ event_data.theme }}</p>
-    <p>State: {{ event_data.state }}</p>
+          <!-- //======= Boutton de lancement =======// -->
+          <div class="launch mt-2">
+            <div v-if="event_data.state == 0">
+              <div class="field">
+                <div class="control">
+                  <button @click="startEvent()" class="button is-link">Lancer</button>
+                </div>
+              </div>
+            </div>
+            <div v-if="event_data.state == 1">
+              <div class="field">
+                <div class="control">
+                  <button @click="endEvent()" class="button is-danger">Stopper</button>
+                </div>
+              </div>
+            </div>
+            <div v-if="event_data.state == 2">
+              <div class="field">
+                <div class="control">
+                  <button @click="startEvent()" class="button is-success">Recommencer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-    <hr />
-    <!-- //======= Liste d'inscrits =======// -->
-
-    <h2 class="title">Inscriptions</h2>
-    <ul>
-      <li v-for="item in this.event_data.users" v-bind:key="item._id">
-        {{ item }}
-        <a @click="deleteUser(item._id)">
-          <span class="icon has-text-danger">
-            <i class="fas fa-trash-alt"></i>
-          </span>
-        </a>
-        <hr />
-      </li>
-    </ul>
-
-    <!-- //======= Formulaire d'envoie de chansons =======// -->
-
-    <h2 class="title">Chansons</h2>
-    <label class="label">Ajouter une musique au catalogue</label>
-    <div class="field has-addons is-grouped">
-      <div class="file has-name">
-        <label class="file-label">
-          <input
-            class="file-input"
-            @change="loadFile"
-            type="file"
-            name="resume"
-            :disabled="isSending === 1"
-          />
-          <span class="file-cta">
-            <span class="file-icon">
-              <i class="fas fa-upload"></i>
-            </span>
-            <span class="file-label">Choisir un fichier</span>
-          </span>
-          <span v-if="isEmpty" class="file-name">{{ this.file.name }}</span>
-          <span v-else class="file-name">Aucun fichier choisi</span>
-        </label>
-      </div>
-
-      <div v-if="isSending === 0" class="control">
-        <a @click="submitFile()" class="button is-info">Envoyer</a>
-      </div>
-
-      <div v-if="isSending === 1" class="control">
-        <a class="button is-info">
-          Envoi en cours
-          <div class="ld ld-ring ld-spin" style="margin-left: 5px;"></div>
-        </a>
-      </div>
-
-      <div v-if="isSending === 2" class="control">
-        <a class="button is-success">
-          Fichier Envoyer
-          <i class="fas fa-check" style="margin-left: 5px ;"></i>
-        </a>
-      </div>
-
-      <div v-if="isSending === 3" class="control">
-        <a class="button is-danger">
-          Erreur
-          <i class="fas fa-times" style="margin-left: 5px ;"></i>
-        </a>
-      </div>
-    </div>
-
-    <!-- //======= Formulaire d'informations manquantes =======// -->
-
-    <div v-if="isMissing">
-      <p>Informations manquantes</p>
-      <div class="field">
-        <label class="label">Titre</label>
-        <div class="control">
-          <input class="input" type="text" v-model="title" placeholder="Titre de la chanson" />
+        <!-- //======= QRCode =======// -->
+        <div class="qrcode">
+          <h2 class="title">QRCode</h2>
+          <div class="card">
+            <div class="card-content">
+              <qrcode :value="this.$route.params.id" :options="{ width: 200 }"></qrcode>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="field">
-        <label class="label">Artiste</label>
-        <div class="control">
-          <input class="input" type="text" v-model="artist" placeholder="Interprète de la chanson" />
+      <!-- //======= Liste d'inscrits =======// -->
+
+      <div class="users mb-4">
+        <h2 class="title">Inscriptions</h2>
+        <table class="table is-fullwidth is-hoverable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Chanteur</th>
+              <th>Titre</th>
+              <th>Artiste</th>
+              <th>Désinscrire</th>
+            </tr>
+          </thead>
+          <tfoot>
+            <tr>
+              <th>#</th>
+              <th>Chanteur</th>
+              <th>Titre</th>
+              <th>Artiste</th>
+              <th>Désinscrire</th>
+            </tr>
+          </tfoot>
+          <tbody>
+            <tr v-for="(item, index) in this.event_data.users" v-bind:key="item._id">
+              <td>{{index}}</td>
+              <td>{{item.first_name}} {{item.last_name}}}}</td>
+              <td>{{item.songs.find(e => e._id === $route.params.id).song.title}}</td>
+              <td>{{item.songs.find(e => e._id === $route.params.id).song.artist}}</td>
+              <td>
+                <a @click="deleteUser(item._id)">
+                  <span class="icon has-text-danger">
+                    <i class="fas fa-times"></i>
+                  </span>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- //======= Formulaire d'envoie de chansons =======// -->
+
+      <div class="musics mb-6">
+        <h2 class="title">Chansons</h2>
+        <label class="label">Ajouter une musique au catalogue</label>
+        <div class="field f-group has-addons is-grouped">
+          <div class="file has-name">
+            <label class="file-label">
+              <input
+                class="file-input"
+                @change="loadFile"
+                type="file"
+                name="resume"
+                :disabled="isSending === 1"
+              />
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fas fa-upload"></i>
+                </span>
+                <span class="file-label">Choisir un fichier</span>
+              </span>
+              <span v-if="isEmpty" class="file-name">{{ this.file.name }}</span>
+              <span v-else class="file-name">Aucun fichier choisi</span>
+            </label>
+          </div>
+
+          <div v-if="isSending === 0" class="control">
+            <a
+              @click="submitFile()"
+              :disabled="isSending === 1 || isMissing === 1"
+              class="button is-primary"
+            >Envoyer</a>
+          </div>
+
+          <div v-if="isSending === 1" class="control">
+            <a class="button is-info">
+              Envoi en cours
+              <div class="ld ld-ring ld-spin" style="margin-left: 5px;"></div>
+            </a>
+          </div>
+
+          <div v-if="isSending === 2" class="control">
+            <a class="button is-success">
+              Fichier Envoyer
+              <i class="fas fa-check" style="margin-left: 5px ;"></i>
+            </a>
+          </div>
+
+          <div v-if="isSending === 3" class="control">
+            <a class="button is-danger">
+              Erreur
+              <i class="fas fa-times" style="margin-left: 5px ;"></i>
+            </a>
+          </div>
         </div>
-      </div>
-      <div class="field">
-        <label class="label">Album</label>
-        <div class="control">
-          <input class="input" type="text" v-model="album" placeholder="Nom de l'album" />
+
+        <!-- //======= Formulaire d'informations manquantes =======// -->
+
+        <div class="mb-4" v-if="isMissing">
+          <p>Informations manquantes</p>
+          <div class="field">
+            <label class="label">Titre</label>
+            <div class="control">
+              <input class="input" type="text" v-model="title" placeholder="Titre de la chanson" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Artiste</label>
+            <div class="control">
+              <input
+                class="input"
+                type="text"
+                v-model="artist"
+                placeholder="Interprète de la chanson"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Album</label>
+            <div class="control">
+              <input class="input" type="text" v-model="album" placeholder="Nom de l'album" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Année</label>
+            <div class="control">
+              <input class="input" type="text" v-model="year" placeholder="Année de réalisation" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Style</label>
+            <div class="control">
+              <input class="input" type="text" v-model="style" placeholder="Genre de la musique" />
+            </div>
+          </div>
+          <div class="control">
+            <button @click="submitChange" class="button is-primary">Envoyer</button>
+          </div>
         </div>
-      </div>
-      <div class="field">
-        <label class="label">Année</label>
-        <div class="control">
-          <input class="input" type="text" v-model="year" placeholder="Année de réalisation" />
-        </div>
-      </div>
-      <div class="control">
-        <button @click="submitChange" class="button is-primary">Submit</button>
-      </div>
-    </div>
 
-    <!-- //======= Liste de chansons de l'évènement =======// -->
+        <!-- //======= Liste de chansons de l'évènement =======// -->
 
-    <label class="label">Chansons selectionnée</label>
-    <ul>
-      <li v-for="item in this.event_data.songs" v-bind:key="item._id">
-        {{ item }}
-        <a @click="deleteSong(item._id)">
-          <span class="icon has-text-danger">
-            <i class="fas fa-trash-alt"></i>
-          </span>
-        </a>
-        <hr />
-      </li>
-    </ul>
+        <div class="music">
+          <div class="card music-selected">
+            <header class="card-header">
+              <p class="card-header-title">Chansons de l'évènement</p>
+            </header>
+            <div class="card-content">
+              <ul>
+                <li v-for="item in this.event_data.songs" v-bind:key="item._id">
+                  {{ item.title }}
+                  <a @click="deleteSong(item._id)">
+                    <span class="icon has-text-danger">
+                      <i class="fas fa-trash-alt"></i>
+                    </span>
+                  </a>
+                  <hr />
+                </li>
+              </ul>
+            </div>
+          </div>
 
-    <!-- //======= Catalogue de Chansons =======// -->
+          <!-- //======= Catalogue de Chansons =======// -->
 
-    <label class="label">Catalogue</label>
-    <ul>
-      <li v-for="item in this.songsList" :key="item._id">
-        {{ item }}
-        <a @click="addSong(item._id)">
-          <span class="icon has-text-success">
-            <i class="fas fa-plus"></i>
-          </span>
-        </a>
-        <hr />
-      </li>
-    </ul>
-
-    <!-- //======= QRCode =======// -->
-
-    <h2 class="title">QRCode</h2>
-    <qrcode :value="this.$route.params.id" :options="{ width: 200 }"></qrcode>
-
-    <!-- //======= Boutton de lancement =======// -->
-
-    <div v-if="event_data.state == 0">
-      <div class="field">
-        <div class="control">
-          <button @click="startEvent()" class="button is-link">Lancer</button>
-        </div>
-      </div>
-    </div>
-    <div v-if="event_data.state == 1">
-      <div class="field">
-        <div class="control">
-          <button @click="endEvent()" class="button is-danger">Stopper</button>
-        </div>
-      </div>
-    </div>
-    <div v-if="event_data.state == 2">
-      <div class="field">
-        <div class="control">
-          <button @click="startEvent()" class="button is-success">Recommencer</button>
+          <div class="card music-library">
+            <header class="card-header">
+              <p class="card-header-title">Catalogue</p>
+            </header>
+            <div class="card-content">
+              <ul>
+                <li v-for="item in this.songsList" :key="item._id">
+                  {{ item.title }}
+                  <a @click="addSong(item._id)">
+                    <span class="icon has-text-success">
+                      <i class="fas fa-plus"></i>
+                    </span>
+                  </a>
+                  <hr />
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -187,6 +261,7 @@ export default {
       artist: "",
       album: "",
       year: "",
+      style: "",
     };
   },
 
@@ -260,7 +335,9 @@ export default {
       this.songTags.append("artist", this.artist);
       this.songTags.append("album", this.album);
       this.songTags.append("date", this.year);
+      this.songTags.append("style", this.style);
       this.isMissing = 0;
+      this.submitFile();
     },
 
     submitFile() {
@@ -365,6 +442,19 @@ export default {
           console.log(err);
         });
     },
+
+    getDate(e) {
+      let d = new Date(e.slice(0, 10));
+      const options = {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      };
+      let dateFR = d.toLocaleDateString("fr-FR", options);
+      this.dateFR = dateFR;
+      return this.dateFR;
+    },
   },
 
   watch: {
@@ -396,5 +486,66 @@ export default {
 @import "../assets/scss/style.scss";
 .modal {
   z-index: 1000;
+}
+
+div.f-group {
+  width: 480px;
+  margin: auto;
+  margin-bottom: 2em;
+  margin-top: 1em;
+
+  span.file-cta {
+    background-color: $primary;
+    color: $beige-lighter;
+  }
+}
+
+div.music-library.card,
+div.music-selected.card {
+  height: 580px;
+  overflow-y: scroll;
+}
+
+div.music {
+  width: 1200px;
+  margin: auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+div.music-library {
+  width: 500px;
+  text-align: right;
+}
+div.music-selected {
+  width: 500px;
+  margin-right: 1em;
+  text-align: left;
+}
+
+div.qrcode div.card {
+  width: 400px;
+  margin: auto;
+  border-radius: 1em;
+  margin-bottom: 2em;
+}
+
+div.event {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 1200px;
+  div.desc {
+    width: 500px;
+    margin-right: 1em;
+  }
+  div.qrcode {
+    width: 500px;
+  }
+}
+
+hr {
+  background-color: $grey-light;
 }
 </style>
