@@ -23,21 +23,27 @@
             <div v-if="event_data.state == 0">
               <div class="field">
                 <div class="control">
-                  <button @click="startEvent()" class="button is-link">Lancer</button>
+                  <button @click="startEvent()" class="button is-link">
+                    Lancer
+                  </button>
                 </div>
               </div>
             </div>
             <div v-if="event_data.state == 1">
               <div class="field">
                 <div class="control">
-                  <button @click="endEvent()" class="button is-danger">Stopper</button>
+                  <button @click="endEvent()" class="button is-danger">
+                    Stopper
+                  </button>
                 </div>
               </div>
             </div>
             <div v-if="event_data.state == 2">
               <div class="field">
                 <div class="control">
-                  <button @click="startEvent()" class="button is-success">Recommencer</button>
+                  <button @click="startEvent()" class="button is-success">
+                    Recommencer
+                  </button>
                 </div>
               </div>
             </div>
@@ -49,7 +55,10 @@
           <h2 class="title">QRCode</h2>
           <div class="card">
             <div class="card-content">
-              <qrcode :value="this.$route.params.id" :options="{ width: 200 }"></qrcode>
+              <qrcode
+                :value="this.$route.params.id"
+                :options="{ width: 200 }"
+              ></qrcode>
             </div>
           </div>
         </div>
@@ -78,11 +87,22 @@
             </tr>
           </tfoot>
           <tbody>
-            <tr v-for="(item, index) in this.event_data.users" v-bind:key="item._id">
-              <td>{{index}}</td>
-              <td>{{item.first_name}} {{item.last_name}}}}</td>
-              <td>{{item.songs.find(e => e._id === $route.params.id).song.title}}</td>
-              <td>{{item.songs.find(e => e._id === $route.params.id).song.artist}}</td>
+            <tr
+              v-for="(item, index) in this.event_data.users"
+              v-bind:key="item._id"
+            >
+              <td>{{ index }}</td>
+              <td>{{ item.first_name }} {{ item.last_name }}</td>
+              <td>
+                {{
+                  item.songs.find((e) => e._id === $route.params.id).song.title
+                }}
+              </td>
+              <td>
+                {{
+                  item.songs.find((e) => e._id === $route.params.id).song.artist
+                }}
+              </td>
               <td>
                 <a @click="deleteUser(item._id)">
                   <span class="icon has-text-danger">
@@ -126,7 +146,8 @@
               @click="submitFile()"
               :disabled="isSending === 1 || isMissing === 1"
               class="button is-primary"
-            >Envoyer</a>
+              >Envoyer</a
+            >
           </div>
 
           <div v-if="isSending === 1" class="control">
@@ -158,7 +179,12 @@
           <div class="field">
             <label class="label">Titre</label>
             <div class="control">
-              <input class="input" type="text" v-model="title" placeholder="Titre de la chanson" />
+              <input
+                class="input"
+                type="text"
+                v-model="title"
+                placeholder="Titre de la chanson"
+              />
             </div>
           </div>
           <div class="field">
@@ -175,23 +201,40 @@
           <div class="field">
             <label class="label">Album</label>
             <div class="control">
-              <input class="input" type="text" v-model="album" placeholder="Nom de l'album" />
+              <input
+                class="input"
+                type="text"
+                v-model="album"
+                placeholder="Nom de l'album"
+              />
             </div>
           </div>
           <div class="field">
             <label class="label">Année</label>
             <div class="control">
-              <input class="input" type="text" v-model="year" placeholder="Année de réalisation" />
+              <input
+                class="input"
+                type="text"
+                v-model="year"
+                placeholder="Année de réalisation"
+              />
             </div>
           </div>
           <div class="field">
             <label class="label">Style</label>
             <div class="control">
-              <input class="input" type="text" v-model="style" placeholder="Genre de la musique" />
+              <input
+                class="input"
+                type="text"
+                v-model="style"
+                placeholder="Genre de la musique"
+              />
             </div>
           </div>
           <div class="control">
-            <button @click="submitChange" class="button is-primary">Envoyer</button>
+            <button @click="submitChange" class="button is-primary">
+              Envoyer
+            </button>
           </div>
         </div>
 
